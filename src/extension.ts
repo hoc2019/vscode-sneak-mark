@@ -4,24 +4,15 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('插件加载成功');
 
     let timeout: NodeJS.Timer | undefined = undefined;
-    const normalDecorationType = vscode.window.createTextEditorDecorationType(
-        {}
-    );
     const snakeDecorationType = vscode.window.createTextEditorDecorationType({
         backgroundColor: { id: 'myextension.sneakBackground' }
     });
     let activeEditor = vscode.window.activeTextEditor;
-    /**
-     *
-     *
-     * @returns
-     */
     function updateDecorations() {
         if (!activeEditor) {
             return;
         }
-        // const regEx = /\d+/g;
-        const textRegEx = /(['|"|`])(.|\s)*\1/g;
+        const textRegEx = /(['|"|`])([^'"`]|\s)*\1/g;
         const charCodeRegEx = /(，|。|‘|’|“|”|？|！)/g;
         const text = activeEditor.document.getText();
         const sneakCharCodes: vscode.DecorationOptions[] = [];
@@ -41,7 +32,6 @@ export function activate(context: vscode.ExtensionContext) {
                     range: new vscode.Range(startPos, endPos),
                     hoverMessage: '这是一个中文标点'
                 };
-                console.log(decoration);
                 sneakCharCodes.push(decoration);
             }
         }
