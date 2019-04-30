@@ -1,27 +1,90 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    console.log('插件加载成功');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "sneak-mark" is now active!');
+    let timeout: NodeJS.Timer | undefined = undefined;
+    const normalDecorationType = vscode.window.createTextEditorDecorationType(
+        {}
+    );
+    const snakeDecorationType = vscode.window.createTextEditorDecorationType({
+        backgroundColor: { id: 'myextension.sneakBackground' }
+    });
+    let activeEditor = vscode.window.activeTextEditor;
+    /**
+     *
+     *
+     * @returns
+     */
+    function updateDecorations() {
+        if (!activeEditor) {
+            return;
+        }
+        // const regEx = /\d+/g;
+        const textRegEx = /(['|"|`])(.|\s)*\1/g;
+        const charCodeRegEx = /(，|。|‘|’|“|”|？|！)/g;
+        const text = activeEditor.document.getText();
+        const sneakCharCodes: vscode.DecorationOptions[] = [];
+        let match;
+        while ((match = textRegEx.exec(text))) {
+            const initialText = match[0];
+            const hasChinese = isChineseChar(initialText);
+            if (hasChinese) {
+                continue;
+            }
+            let charCodeMatch;
+            while ((charCodeMatch = charCodeRegEx.exec(text))) {
+                const startIndex = charCodeMatch.index;
+                const startPos = activeEditor.document.positionAt(startIndex);
+                const endPos = activeEditor.document.positionAt(startIndex + 1);
+                const decoration = {
+                    range: new vscode.Range(startPos, endPos),
+                    hoverMessage: '这是一个中文标点'
+                };
+                console.log(decoration);
+                sneakCharCodes.push(decoration);
+            }
+        }
+        activeEditor.setDecorations(snakeDecorationType, sneakCharCodes);
+    }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.findSneak', () => {
-		// The code you place here will be executed every time your command is executed
+    function isChineseChar(str: string) {
+        var reg = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
+        return reg.test(str);
+    }
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('find sneak!');
-	});
+    function triggerUpdateDecorations() {
+        if (timeout) {
+            clearTimeout(timeout);
+            timeout = undefined;
+        }
+        timeout = setTimeout(updateDecorations, 500);
+    }
 
-	context.subscriptions.push(disposable);
+    if (activeEditor) {
+        triggerUpdateDecorations();
+    }
+
+    vscode.window.onDidChangeActiveTextEditor(
+        editor => {
+            activeEditor = editor;
+            if (editor) {
+                triggerUpdateDecorations();
+            }
+        },
+        null,
+        context.subscriptions
+    );
+
+    vscode.workspace.onDidChangeTextDocument(
+        event => {
+            if (activeEditor && event.document === activeEditor.document) {
+                triggerUpdateDecorations();
+            }
+        },
+        null,
+        context.subscriptions
+    );
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}
