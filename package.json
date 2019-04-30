@@ -3,6 +3,13 @@
     "displayName": "sneak mark",
     "description": "检测英文语句中的中文符号",
     "version": "0.0.1",
+    "keywords": [
+        "中文",
+        "标点",
+        "chinese",
+        "mark"
+    ],
+    "publisher": "wangzy",
     "engines": {
         "vscode": "^1.33.0"
     },
