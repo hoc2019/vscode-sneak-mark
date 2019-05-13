@@ -20,12 +20,13 @@ export function activate(context: vscode.ExtensionContext) {
         while ((match = textRegEx.exec(text))) {
             const initialText = match[0];
             const hasChinese = isChineseChar(initialText);
-            if (hasChinese) {
+            const hasChineseMark = isChineseMark(initialText);
+            if (hasChinese || !hasChineseMark) {
                 continue;
             }
             let charCodeMatch;
-            while ((charCodeMatch = charCodeRegEx.exec(text))) {
-                const startIndex = charCodeMatch.index;
+            while ((charCodeMatch = charCodeRegEx.exec(initialText))) {
+                const startIndex = match.index + charCodeMatch.index;
                 const startPos = activeEditor.document.positionAt(startIndex);
                 const endPos = activeEditor.document.positionAt(startIndex + 1);
                 const decoration = {
@@ -40,6 +41,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     function isChineseChar(str: string) {
         var reg = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
+        return reg.test(str);
+    }
+    function isChineseMark(str: string) {
+        var reg = /(，|。|‘|’|“|”|？|！)/;
         return reg.test(str);
     }
 
