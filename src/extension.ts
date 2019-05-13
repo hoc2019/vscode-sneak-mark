@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+let myStatusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('插件加载成功');
@@ -36,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
                 sneakCharCodes.push(decoration);
             }
         }
+        updateStatusBarItem(sneakCharCodes.length);
         activeEditor.setDecorations(snakeDecorationType, sneakCharCodes);
     }
 
@@ -80,6 +82,20 @@ export function activate(context: vscode.ExtensionContext) {
         null,
         context.subscriptions
     );
+
+    myStatusBarItem = vscode.window.createStatusBarItem(
+        vscode.StatusBarAlignment.Right,
+        100
+    );
+    context.subscriptions.push(myStatusBarItem);
+}
+
+function updateStatusBarItem(num: number): void {
+    if (num < 0) {
+        return;
+    }
+    myStatusBarItem.text = `存在${num}个异常标点`;
+    myStatusBarItem.show();
 }
 
 export function deactivate() {}
