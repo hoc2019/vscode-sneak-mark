@@ -106,5 +106,3 @@ function updateStatusBarItem(num: number): void {
     myStatusBarItem.text = `存在${num}个异常标点`;
     myStatusBarItem.show();
 }
-
-export function deactivate() {}
