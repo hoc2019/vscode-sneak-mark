@@ -89,7 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
     context.subscriptions.push(myStatusBarItem);
 }
-
+//状态栏展示异常标点统计
 function updateStatusBarItem(num: number): void {
     if (num < 0) {
         return;
