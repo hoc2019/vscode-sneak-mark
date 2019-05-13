@@ -5,6 +5,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('插件加载成功');
 
     let timeout: NodeJS.Timer | undefined = undefined;
+    const collection = vscode.languages.createDiagnosticCollection('test');
     const snakeDecorationType = vscode.window.createTextEditorDecorationType({
         backgroundColor: { id: 'myextension.sneakBackground' }
     });
@@ -18,6 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
         const text = activeEditor.document.getText();
         const sneakCharCodes: vscode.DecorationOptions[] = [];
         let match;
+        const posList = [];
         while ((match = textRegEx.exec(text))) {
             const initialText = match[0];
             const hasChinese = isChineseChar(initialText);
@@ -30,6 +32,13 @@ export function activate(context: vscode.ExtensionContext) {
                 const startIndex = match.index + charCodeMatch.index;
                 const startPos = activeEditor.document.positionAt(startIndex);
                 const endPos = activeEditor.document.positionAt(startIndex + 1);
+                posList.push({
+                    code: '',
+                    message: '异常中文标点',
+                    range: new vscode.Range(startPos, endPos),
+                    severity: vscode.DiagnosticSeverity.Warning,
+                    source: ''
+                });
                 const decoration = {
                     range: new vscode.Range(startPos, endPos),
                     hoverMessage: '这是一个中文标点'
@@ -37,6 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
                 sneakCharCodes.push(decoration);
             }
         }
+        collection.set(activeEditor.document.uri, posList);
         updateStatusBarItem(sneakCharCodes.length);
         activeEditor.setDecorations(snakeDecorationType, sneakCharCodes);
     }
