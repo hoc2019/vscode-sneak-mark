@@ -5,7 +5,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('插件加载成功');
 
     let timeout: NodeJS.Timer | undefined = undefined;
-    const collection = vscode.languages.createDiagnosticCollection('test');
+    const collection = vscode.languages.createDiagnosticCollection('sneak');
     const snakeDecorationType = vscode.window.createTextEditorDecorationType({
         backgroundColor: { id: 'myextension.sneakBackground' }
     });
@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const startPos = activeEditor.document.positionAt(startIndex);
                 const endPos = activeEditor.document.positionAt(startIndex + 1);
                 posList.push({
-                    code: '',
+                    // code: 'hhh',
                     message: '异常中文标点',
                     range: new vscode.Range(startPos, endPos),
                     severity: vscode.DiagnosticSeverity.Warning,
@@ -41,7 +41,6 @@ export function activate(context: vscode.ExtensionContext) {
                 });
                 const decoration = {
                     range: new vscode.Range(startPos, endPos),
-                    hoverMessage: '这是一个中文标点'
                 };
                 sneakCharCodes.push(decoration);
             }
