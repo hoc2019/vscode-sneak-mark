@@ -13,8 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (!activeEditor) {
             return;
         }
-        // const textRegEx = /(['|"|`])([^'"`]|\s)*\1/g;、
-        const textRegEx = /(['|"|`]).*(，|。|‘|’|“|”|？|！)+.*\1/g;
+        const textRegEx = /(['|"|`])[\s\S]*?\1/g;
+        // const textRegEx = /(['|"|`]).*(，|。|‘|’|“|”|？|！)+.*\1/g;
         const charCodeRegEx = /(，|。|‘|’|“|”|？|！)/g;
         const text = activeEditor.document.getText();
         const sneakCharCodes: vscode.DecorationOptions[] = [];
@@ -23,7 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
         while ((match = textRegEx.exec(text))) {
             const initialText = match[0];
             const hasChinese = isChineseChar(initialText);
-            if (hasChinese) {
+            const hasChineseMark = isChineseMark(initialText);
+            if (hasChinese || !hasChineseMark) {
                 continue;
             }
             let charCodeMatch;
@@ -47,6 +48,11 @@ export function activate(context: vscode.ExtensionContext) {
         collection.set(activeEditor.document.uri, posList);
         updateStatusBarItem(sneakCharCodes.length);
         activeEditor.setDecorations(snakeDecorationType, sneakCharCodes);
+    }
+
+    function isChineseMark(str: string) {
+        var reg = /(，|。|‘|’|“|”|？|！)/;
+        return reg.test(str);
     }
 
     function isChineseChar(str: string) {
