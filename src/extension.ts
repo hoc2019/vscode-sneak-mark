@@ -3,7 +3,6 @@ let myStatusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('插件加载成功');
-
     let timeout: NodeJS.Timer | undefined = undefined;
     const collection = vscode.languages.createDiagnosticCollection('sneak');
     const snakeDecorationType = vscode.window.createTextEditorDecorationType({
@@ -14,7 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (!activeEditor) {
             return;
         }
-        const textRegEx = /(['|"|`])([^'"`]|\s)*\1/g;
+        // const textRegEx = /(['|"|`])([^'"`]|\s)*\1/g;、
+        const textRegEx = /(['|"|`]).*(，|。|‘|’|“|”|？|！)+.*\1/g;
         const charCodeRegEx = /(，|。|‘|’|“|”|？|！)/g;
         const text = activeEditor.document.getText();
         const sneakCharCodes: vscode.DecorationOptions[] = [];
@@ -23,8 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
         while ((match = textRegEx.exec(text))) {
             const initialText = match[0];
             const hasChinese = isChineseChar(initialText);
-            const hasChineseMark = isChineseMark(initialText);
-            if (hasChinese || !hasChineseMark) {
+            if (hasChinese) {
                 continue;
             }
             let charCodeMatch;
@@ -40,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
                     source: ''
                 });
                 const decoration = {
-                    range: new vscode.Range(startPos, endPos),
+                    range: new vscode.Range(startPos, endPos)
                 };
                 sneakCharCodes.push(decoration);
             }
@@ -54,11 +53,6 @@ export function activate(context: vscode.ExtensionContext) {
         var reg = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
         return reg.test(str);
     }
-    function isChineseMark(str: string) {
-        var reg = /(，|。|‘|’|“|”|？|！)/;
-        return reg.test(str);
-    }
-
     function triggerUpdateDecorations() {
         if (timeout) {
             clearTimeout(timeout);
