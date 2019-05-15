@@ -22,17 +22,17 @@
     ],
     "main": "./out/extension.js",
     "contributes": {
-        "colors": [
-            {
-                "id": "myextension.sneakBackground",
-                "description": "英文中的中文标点样式",
-                "defaults": {
-                    "dark": "#FF000055",
-                    "light": "#FF000055",
-                    "highContrast": "#FF000055"
+        "configuration": {
+            "type": "object",
+            "title": "Sneak mark",
+            "properties": {
+                "sneakMark.markColor": {
+                    "type": "string",
+                    "default": "#FF000055",
+                    "description": "标记颜色"
                 }
             }
-        ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
