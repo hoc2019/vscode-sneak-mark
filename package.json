@@ -2,7 +2,7 @@
     "name": "sneak-mark",
     "displayName": "sneak mark",
     "description": "检测英文语句中的中文符号",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "icon": "logo.jpg",
     "keywords": [
         "中文",
