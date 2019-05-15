@@ -8,14 +8,16 @@ export function activate(context: vscode.ExtensionContext) {
     const snakeDecorationType = vscode.window.createTextEditorDecorationType({
         backgroundColor: { id: 'myextension.sneakBackground' }
     });
+    //匹配需要标识出的标点符号，计划后期可添加配置
+    const charCodeRegEx = /(，|。|‘|’|“|”|？|！)/g;
+    //激活中的编辑页面
     let activeEditor = vscode.window.activeTextEditor;
     function updateDecorations() {
         if (!activeEditor) {
             return;
         }
-        const textRegEx = /(['|"|`])[\s\S]*?\1/g;
-        // const textRegEx = /(['|"|`]).*(，|。|‘|’|“|”|？|！)+.*\1/g;
-        const charCodeRegEx = /(，|。|‘|’|“|”|？|！)/g;
+        //匹配被'',"",``符号包裹的文本
+        const textRegEx = /(['"`])[\s\S]*?\1/g;
         const text = activeEditor.document.getText();
         const sneakCharCodes: vscode.DecorationOptions[] = [];
         let match;
@@ -29,6 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
             let charCodeMatch;
             while ((charCodeMatch = charCodeRegEx.exec(initialText))) {
+                console.log(charCodeMatch);
                 const startIndex = match.index + charCodeMatch.index;
                 const startPos = activeEditor.document.positionAt(startIndex);
                 const endPos = activeEditor.document.positionAt(startIndex + 1);
@@ -51,8 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     function isChineseMark(str: string) {
-        var reg = /(，|。|‘|’|“|”|？|！)/;
-        return reg.test(str);
+        return charCodeRegEx.test(str);
     }
 
     function isChineseChar(str: string) {
